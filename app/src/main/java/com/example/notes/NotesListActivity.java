@@ -3,6 +3,7 @@ package com.example.notes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,10 +15,12 @@ import android.view.View;
 
 import com.example.notes.adapters.NotesRecyclerAdapter;
 import com.example.notes.model.Note;
+import com.example.notes.persistence.NoteRepository;
 import com.example.notes.util.VerticalSpacingItemDecorator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 // AppCompat refers to compatibility with more versions of Android
 public class NotesListActivity extends AppCompatActivity implements
@@ -32,6 +35,7 @@ public class NotesListActivity extends AppCompatActivity implements
     // Variables
     private ArrayList<Note> mNotes = new ArrayList<>();
     private NotesRecyclerAdapter mNoteRecyclerAdapter;
+    private NoteRepository mNoteRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +44,39 @@ public class NotesListActivity extends AppCompatActivity implements
         // Activity classes have an implicit view reference, so we can implicitly call findViewByID
         mRecyclerView = findViewById(R.id.recyclerView);
 
+        mNoteRepository = new NoteRepository(this);
+
         // Initialize empty RecyclerView
         initRecyclerView();
-        insertFakeNotes();
+        retrieveNotes();
+        // insertFakeNotes();
 
         setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
         setTitle("Notes");
 
         // Attaching onClick listener interface to floating action button
         findViewById(R.id.fab).setOnClickListener(this);
+    }
+
+    /*
+        Every time there is a change to the DB, this method is called and the list of notes is
+        re-queried into mNotes.   Any DB calls using LiveData is asynchronous, or working in a
+        background thread, which is good because you can't do DB transactions on the main thread
+        in Room.
+     */
+    private void retrieveNotes() {
+        mNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(List<Note> notes) {
+                if (mNotes.size() > 0) {
+                    mNotes.clear();
+                }
+                if (notes != null) {
+                    mNotes.addAll(notes);
+                }
+                mNoteRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void insertFakeNotes() {
@@ -98,6 +126,8 @@ public class NotesListActivity extends AppCompatActivity implements
     private void deleteNote(Note note) {
         mNotes.remove(note);
         mNoteRecyclerAdapter.notifyDataSetChanged();
+
+        mNoteRepository.deleteNote(note);
     }
 
     // Designed to work with RecyclerViews.  SimpleCallback is a simpler version of Callback

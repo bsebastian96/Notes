@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.gesture.Gesture;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -18,11 +20,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.notes.model.Note;
+import com.example.notes.persistence.NoteRepository;
+import com.example.notes.util.Utility;
 
 public class NoteActivity extends AppCompatActivity implements View.OnTouchListener,
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        TextWatcher {
 
     private static final String TAG = "NoteActivity";
     private static final int EDIT_MODE_ENABLED = 1;
@@ -41,6 +46,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     private GestureDetector mGestureDetector;
     // Keeps track of the state
     private int mMode;
+    private NoteRepository mNoteRepository;
+    private Note mFinalNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mBackArrowContainer = findViewById(R.id.back_arrow_container);
         mCheck = findViewById(R.id.toolbar_check);
         mBackArrow = findViewById(R.id.toolbar_back_arrow);
+
+        mNoteRepository = new NoteRepository(this);
 
         // Checks if incoming intent is for a new note or an already existing note
         if (getIncomingIntent()) {
@@ -79,6 +88,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         if (getIntent().hasExtra("selected_note")) {
             mInitialNote = getIntent().getParcelableExtra("selected_note");
 
+            mFinalNote = new Note();
+            mFinalNote.setTitle(mInitialNote.getTitle());
+            mFinalNote.setContent(mInitialNote.getContent());
+            mFinalNote.setTimestamp(mInitialNote.getTimestamp());
+            mFinalNote.setId(mInitialNote.getId());
+            
             mMode = EDIT_MODE_DISABLED;
             mIsNewNote = false;
             return false;
@@ -92,6 +107,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     private void setNewNoteProperties() {
         mViewTitle.setText("Note Title");
         mEditTitle.setText("Note Title");
+
+        mInitialNote = new Note();
+        mFinalNote = new Note();
+        mInitialNote.setTitle("Note Title");
+        mFinalNote.setTitle("Note Title");
     }
 
     // Sets properties for viewing note that already existed
@@ -123,6 +143,22 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mMode = EDIT_MODE_DISABLED;
 
         disableContentInteraction();
+
+        // Saving note if the title or note content has changed
+        String temp = mLinedEditText.getText().toString();
+        temp = temp.replace("\n", "");
+        temp = temp.replace(" ", "");
+        if (temp.length() > 0) {
+            mFinalNote.setTitle(mEditTitle.getText().toString());
+            mFinalNote.setContent(mLinedEditText.getText().toString());
+            String timestamp = Utility.getCurrentTimestamp();
+            mFinalNote.setTimestamp(timestamp);
+
+            if (!mFinalNote.getContent().equals(mInitialNote.getContent()) ||
+                    !mFinalNote.getTitle().equals(mInitialNote.getTitle())) {
+                saveChanges();
+            }
+        }
     }
 
     /*
@@ -171,6 +207,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mViewTitle.setOnClickListener(this);
         mCheck.setOnClickListener(this);
         mBackArrow.setOnClickListener(this);
+        mEditTitle.addTextChangedListener(this);
     }
 
     @Override
@@ -284,5 +321,41 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         if (mMode == EDIT_MODE_ENABLED) {
             enableEditMode();
         }
+    }
+
+    // Saving note by checking if it is a new note and calling saveNewNote
+    private void saveChanges() {
+        if (mIsNewNote) {
+            saveNewNote();
+        } else {
+            updateNote();
+        }
+    }
+
+    private void updateNote() {
+        mNoteRepository.updateNote(mFinalNote);
+    }
+
+    private void saveNewNote() {
+        mNoteRepository.insertNoteTask(mFinalNote);
+    }
+
+    /*
+        Methods for extending TextWatcher to save the title name in the view mode after changing
+        the title in the edit mode and clicking the check mark
+     */
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        mViewTitle.setText(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

@@ -1,5 +1,6 @@
 package com.example.notes.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notes.R;
 import com.example.notes.model.Note;
+import com.example.notes.util.Utility;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
  */
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> {
 
+    private static final String TAG = "NotesRecyclerAdapter";
     // Using ArrayList to dynamically add list items without a fixed size
     private ArrayList<Note> mNotes = new ArrayList<>();
     private OnNoteListener mOnNoteListener;
@@ -42,8 +45,16 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     // Called for every single entry in the list, sets the attributes
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.timestamp.setText(mNotes.get(position).getTimestamp());
-        holder.title.setText(mNotes.get(position).getTitle());
+        try {
+            String month = mNotes.get(position).getTimestamp().substring(0,2);
+            month = Utility.getMonthFromNumber(month);
+            String year = mNotes.get(position).getTimestamp().substring(3);
+            String timestamp = month + " " + year;
+            holder.timestamp.setText(timestamp);
+            holder.title.setText(mNotes.get(position).getTitle());
+        } catch (NullPointerException e) {
+            Log.d(TAG, "onBindViewHolder: NullPointerException " + e.getMessage());
+        }
     }
 
     // Number of entries in the list
@@ -54,7 +65,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
     /*
       When using a RecyclerView, we need a view holder class to hold the view of each
-      individual list item so each item has a view holder.  We attack an OnClickLister
+      individual list item so each item has a view holder.  We attach an OnClickLister
      */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
