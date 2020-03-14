@@ -51,8 +51,12 @@ public class NotesListActivity extends AppCompatActivity implements
         retrieveNotes();
         // insertFakeNotes();
 
-        setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
-        setTitle("Notes");
+        Toolbar toolbar = findViewById(R.id.notes_toolbar);
+        toolbar.setTitle("Notes");
+        toolbar.setTitleTextAppearance(this, R.style.CustomText);
+        setSupportActionBar(toolbar);
+        //setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
+        //setTitle("Notes");
 
         // Attaching onClick listener interface to floating action button
         findViewById(R.id.fab).setOnClickListener(this);

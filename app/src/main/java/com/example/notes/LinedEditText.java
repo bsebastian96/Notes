@@ -2,6 +2,7 @@ package com.example.notes;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -20,7 +21,7 @@ public class LinedEditText extends AppCompatEditText {
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
-        mPaint.setColor(0xFFFFD966);
+        mPaint.setColor(Color.BLACK);
     }
 
 

@@ -93,7 +93,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
             mFinalNote.setContent(mInitialNote.getContent());
             mFinalNote.setTimestamp(mInitialNote.getTimestamp());
             mFinalNote.setId(mInitialNote.getId());
-            
+
             mMode = EDIT_MODE_DISABLED;
             mIsNewNote = false;
             return false;
