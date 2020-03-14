@@ -10,15 +10,15 @@ import com.example.notes.persistence.NoteDao;
  */
 public class InsertAsyncTask extends AsyncTask<Note, Void, Void> {
 
-    private NoteDao mNoteDao;
+    private NoteDao gNoteDao;
 
     public InsertAsyncTask(NoteDao dao) {
-        mNoteDao = dao;
+        gNoteDao = dao;
     }
 
     @Override
     protected Void doInBackground(Note... notes) {
-        mNoteDao.insertNotes(notes);
+        gNoteDao.insertNotes(notes);
         return null;
     }
 }

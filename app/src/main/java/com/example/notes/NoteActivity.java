@@ -4,12 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
-import android.gesture.Gesture;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,34 +31,35 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     public static final int EDIT_MODE_DISABLED = 0;
 
     // UI components
-    private LinedEditText mLinedEditText;
-    private EditText mEditTitle;
-    private TextView mViewTitle;
-    private RelativeLayout mCheckContainer, mBackArrowContainer;
-    private ImageButton mCheck, mBackArrow;
+    // Preceding all global variables with char 'g' to indicate global
+    private LinedEditText gLinedEditText;
+    private EditText gEditTitle;
+    private TextView gViewTitle;
+    private RelativeLayout gCheckContainer, gBackArrowContainer;
+    private ImageButton gCheck, gBackArrow;
 
     // Variables
-    private boolean mIsNewNote;
-    private Note mInitialNote;
-    private GestureDetector mGestureDetector;
+    private boolean gIsNewNote;
+    private Note gInitialNote;
+    private GestureDetector gGestureDetector;
     // Keeps track of the state
-    private int mMode;
-    private NoteRepository mNoteRepository;
-    private Note mFinalNote;
+    private int gMode;
+    private NoteRepository gNoteRepository;
+    private Note gFinalNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
-        mLinedEditText = findViewById(R.id.note_text);
-        mEditTitle = findViewById(R.id.note_edit_title);
-        mViewTitle = findViewById(R.id.note_text_title);
-        mCheckContainer = findViewById(R.id.check_container);
-        mBackArrowContainer = findViewById(R.id.back_arrow_container);
-        mCheck = findViewById(R.id.toolbar_check);
-        mBackArrow = findViewById(R.id.toolbar_back_arrow);
+        gLinedEditText = findViewById(R.id.note_text);
+        gEditTitle = findViewById(R.id.note_edit_title);
+        gViewTitle = findViewById(R.id.note_text_title);
+        gCheckContainer = findViewById(R.id.check_container);
+        gBackArrowContainer = findViewById(R.id.back_arrow_container);
+        gCheck = findViewById(R.id.toolbar_check);
+        gBackArrow = findViewById(R.id.toolbar_back_arrow);
 
-        mNoteRepository = new NoteRepository(this);
+        gNoteRepository = new NoteRepository(this);
 
         // Checks if incoming intent is for a new note or an already existing note
         if (getIncomingIntent()) {
@@ -86,76 +84,76 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
      */
     private boolean getIncomingIntent() {
         if (getIntent().hasExtra("selected_note")) {
-            mInitialNote = getIntent().getParcelableExtra("selected_note");
+            gInitialNote = getIntent().getParcelableExtra("selected_note");
 
-            mFinalNote = new Note();
-            mFinalNote.setTitle(mInitialNote.getTitle());
-            mFinalNote.setContent(mInitialNote.getContent());
-            mFinalNote.setTimestamp(mInitialNote.getTimestamp());
-            mFinalNote.setId(mInitialNote.getId());
+            gFinalNote = new Note();
+            gFinalNote.setTitle(gInitialNote.getTitle());
+            gFinalNote.setContent(gInitialNote.getContent());
+            gFinalNote.setTimestamp(gInitialNote.getTimestamp());
+            gFinalNote.setId(gInitialNote.getId());
 
-            mMode = EDIT_MODE_DISABLED;
-            mIsNewNote = false;
+            gMode = EDIT_MODE_DISABLED;
+            gIsNewNote = false;
             return false;
         }
-        mMode = EDIT_MODE_ENABLED;
-        mIsNewNote = true;
+        gMode = EDIT_MODE_ENABLED;
+        gIsNewNote = true;
         return true;
     }
 
     // Sets properties for a new Note, not implemented yet
     private void setNewNoteProperties() {
-        mViewTitle.setText("Note Title");
-        mEditTitle.setText("Note Title");
+        gViewTitle.setText("Note Title");
+        gEditTitle.setText("Note Title");
 
-        mInitialNote = new Note();
-        mFinalNote = new Note();
-        mInitialNote.setTitle("Note Title");
-        mFinalNote.setTitle("Note Title");
+        gInitialNote = new Note();
+        gFinalNote = new Note();
+        gInitialNote.setTitle("Note Title");
+        gFinalNote.setTitle("Note Title");
     }
 
     // Sets properties for viewing note that already existed
     private void setNoteProperties() {
-        mViewTitle.setText(mInitialNote.getTitle());
-        mEditTitle.setText(mInitialNote.getTitle());
-        mLinedEditText.setText(mInitialNote.getContent());
+        gViewTitle.setText(gInitialNote.getTitle());
+        gEditTitle.setText(gInitialNote.getTitle());
+        gLinedEditText.setText(gInitialNote.getContent());
     }
 
     private void enableEditMode() {
-        mBackArrowContainer.setVisibility(View.GONE);
-        mCheckContainer.setVisibility(View.VISIBLE);
+        gBackArrowContainer.setVisibility(View.GONE);
+        gCheckContainer.setVisibility(View.VISIBLE);
 
-        mViewTitle.setVisibility(View.GONE);
-        mEditTitle.setVisibility(View.VISIBLE);
+        gViewTitle.setVisibility(View.GONE);
+        gEditTitle.setVisibility(View.VISIBLE);
 
-        mMode = EDIT_MODE_ENABLED;
+        gMode = EDIT_MODE_ENABLED;
 
         enableContentInteraction();
     }
 
     private void disableEditMode() {
-        mBackArrowContainer.setVisibility(View.VISIBLE);
-        mCheckContainer.setVisibility(View.GONE);
+        gBackArrowContainer.setVisibility(View.VISIBLE);
+        gCheckContainer.setVisibility(View.GONE);
 
-        mViewTitle.setVisibility(View.VISIBLE);
-        mEditTitle.setVisibility(View.GONE);
+        gViewTitle.setVisibility(View.VISIBLE);
+        gEditTitle.setVisibility(View.GONE);
 
-        mMode = EDIT_MODE_DISABLED;
+        gMode = EDIT_MODE_DISABLED;
 
         disableContentInteraction();
 
         // Saving note if the title or note content has changed
-        String temp = mLinedEditText.getText().toString();
+        String temp = gLinedEditText.getText().toString();
         temp = temp.replace("\n", "");
         temp = temp.replace(" ", "");
         if (temp.length() > 0) {
-            mFinalNote.setTitle(mEditTitle.getText().toString());
-            mFinalNote.setContent(mLinedEditText.getText().toString());
+            gFinalNote.setTitle(gEditTitle.getText().toString());
+            gFinalNote.setContent(gLinedEditText.getText().toString());
             String timestamp = Utility.getCurrentTimestamp();
-            mFinalNote.setTimestamp(timestamp);
+            gFinalNote.setTimestamp(timestamp);
 
-            if (!mFinalNote.getContent().equals(mInitialNote.getContent()) ||
-                    !mFinalNote.getTitle().equals(mInitialNote.getTitle())) {
+            if (!gFinalNote.getContent().equals(gInitialNote.getContent()) ||
+                    !gFinalNote.getTitle().equals(gInitialNote.getTitle())) {
                 saveChanges();
             }
         }
@@ -166,11 +164,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         single clicks opening edit mode for the content
      */
     private void disableContentInteraction() {
-        mLinedEditText.setKeyListener(null);
-        mLinedEditText.setFocusable(false);
-        mLinedEditText.setFocusableInTouchMode(false);
-        mLinedEditText.setCursorVisible(false);
-        mLinedEditText.clearFocus();
+        gLinedEditText.setKeyListener(null);
+        gLinedEditText.setFocusable(false);
+        gLinedEditText.setFocusableInTouchMode(false);
+        gLinedEditText.setCursorVisible(false);
+        gLinedEditText.clearFocus();
     }
 
     /*
@@ -178,11 +176,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         reassign the key listener to the default since the disable method sets it to null
      */
     private void enableContentInteraction() {
-        mLinedEditText.setKeyListener(new EditText(this).getKeyListener());
-        mLinedEditText.setFocusable(true);
-        mLinedEditText.setFocusableInTouchMode(true);
-        mLinedEditText.setCursorVisible(true);
-        mLinedEditText.requestFocus();
+        gLinedEditText.setKeyListener(new EditText(this).getKeyListener());
+        gLinedEditText.setFocusable(true);
+        gLinedEditText.setFocusableInTouchMode(true);
+        gLinedEditText.setCursorVisible(true);
+        gLinedEditText.requestFocus();
     }
 
     // Fixing keyboard not disappearing when leaving edit mode, android keyboard = soft keyboard
@@ -202,17 +200,17 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         corresponding to the type of touch that occurred
      */
     private void setListeners() {
-        mLinedEditText.setOnTouchListener(this);
-        mGestureDetector = new GestureDetector(this, this);
-        mViewTitle.setOnClickListener(this);
-        mCheck.setOnClickListener(this);
-        mBackArrow.setOnClickListener(this);
-        mEditTitle.addTextChangedListener(this);
+        gLinedEditText.setOnTouchListener(this);
+        gGestureDetector = new GestureDetector(this, this);
+        gViewTitle.setOnClickListener(this);
+        gCheck.setOnClickListener(this);
+        gBackArrow.setOnClickListener(this);
+        gEditTitle.addTextChangedListener(this);
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event);
+        return gGestureDetector.onTouchEvent(event);
     }
 
     @Override
@@ -274,8 +272,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
             case R.id.note_text_title: {
                 enableEditMode();
                 // When clicking the title, we want the cursor focus to be at the end of the string
-                mEditTitle.requestFocus();
-                mEditTitle.setSelection(mEditTitle.length());
+                gEditTitle.requestFocus();
+                gEditTitle.setSelection(gEditTitle.length());
                 break;
             }
 
@@ -295,8 +293,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
      */
     @Override
     public void onBackPressed() {
-        if (mMode == EDIT_MODE_ENABLED) {
-            onClick(mCheck);
+        if (gMode == EDIT_MODE_ENABLED) {
+            onClick(gCheck);
         } else {
             super.onBackPressed();
         }
@@ -311,21 +309,21 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("mode", mMode);
+        outState.putInt("mode", gMode);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mMode = savedInstanceState.getInt("mode");
-        if (mMode == EDIT_MODE_ENABLED) {
+        gMode = savedInstanceState.getInt("mode");
+        if (gMode == EDIT_MODE_ENABLED) {
             enableEditMode();
         }
     }
 
     // Saving note by checking if it is a new note and calling saveNewNote
     private void saveChanges() {
-        if (mIsNewNote) {
+        if (gIsNewNote) {
             saveNewNote();
         } else {
             updateNote();
@@ -333,11 +331,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void updateNote() {
-        mNoteRepository.updateNote(mFinalNote);
+        gNoteRepository.updateNote(gFinalNote);
     }
 
     private void saveNewNote() {
-        mNoteRepository.insertNoteTask(mFinalNote);
+        gNoteRepository.insertNoteTask(gFinalNote);
     }
 
     /*
@@ -351,7 +349,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        mViewTitle.setText(s.toString());
+        gViewTitle.setText(s.toString());
     }
 
     @Override

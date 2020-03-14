@@ -25,12 +25,12 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
     private static final String TAG = "NotesRecyclerAdapter";
     // Using ArrayList to dynamically add list items without a fixed size
-    private ArrayList<Note> mNotes = new ArrayList<>();
-    private OnNoteListener mOnNoteListener;
+    private ArrayList<Note> gNotes = new ArrayList<>();
+    private OnNoteListener gOnNoteListener;
 
     public NotesRecyclerAdapter(ArrayList<Note> notes, OnNoteListener onNoteListener) {
-        this.mNotes = notes;
-        this.mOnNoteListener = onNoteListener;
+        this.gNotes = notes;
+        this.gOnNoteListener = onNoteListener;
     }
 
     // Creates ViewHolder object
@@ -39,19 +39,19 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_note_list_item,
                 parent, false);
-        return new ViewHolder(view, mOnNoteListener);
+        return new ViewHolder(view, gOnNoteListener);
     }
 
     // Called for every single entry in the list, sets the attributes
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         try {
-            String month = mNotes.get(position).getTimestamp().substring(0,2);
+            String month = gNotes.get(position).getTimestamp().substring(0,2);
             month = Utility.getMonthFromNumber(month);
-            String year = mNotes.get(position).getTimestamp().substring(3);
+            String year = gNotes.get(position).getTimestamp().substring(3);
             String timestamp = month + " " + year;
             holder.timestamp.setText(timestamp);
-            holder.title.setText(mNotes.get(position).getTitle());
+            holder.title.setText(gNotes.get(position).getTitle());
         } catch (NullPointerException e) {
             Log.d(TAG, "onBindViewHolder: NullPointerException " + e.getMessage());
         }
@@ -60,7 +60,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     // Number of entries in the list
     @Override
     public int getItemCount() {
-        return mNotes.size();
+        return gNotes.size();
     }
 
     /*

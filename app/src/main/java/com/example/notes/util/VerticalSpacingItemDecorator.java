@@ -8,14 +8,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class VerticalSpacingItemDecorator extends RecyclerView.ItemDecoration {
 
-    private final int verticalSpaceHeight;
+    private final int gVerticalSpaceHeight;
 
     public VerticalSpacingItemDecorator(int verticalSpaceHeight) {
-        this.verticalSpaceHeight = verticalSpaceHeight;
+        this.gVerticalSpaceHeight = verticalSpaceHeight;
     }
 
     @Override
-    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        outRect.bottom = verticalSpaceHeight;
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                               @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        outRect.bottom = gVerticalSpaceHeight;
     }
 }

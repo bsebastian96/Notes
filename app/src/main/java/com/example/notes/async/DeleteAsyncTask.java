@@ -10,15 +10,15 @@ import com.example.notes.persistence.NoteDao;
  */
 public class DeleteAsyncTask extends AsyncTask<Note, Void, Void> {
 
-    private NoteDao mNoteDao;
+    private NoteDao gNoteDao;
 
     public DeleteAsyncTask(NoteDao dao) {
-        mNoteDao = dao;
+        gNoteDao = dao;
     }
 
     @Override
     protected Void doInBackground(Note... notes) {
-        mNoteDao.deleteNotes(notes);
+        gNoteDao.deleteNotes(notes);
         return null;
     }
 }

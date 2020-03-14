@@ -17,7 +17,6 @@ import com.example.notes.adapters.NotesRecyclerAdapter;
 import com.example.notes.model.Note;
 import com.example.notes.persistence.NoteRepository;
 import com.example.notes.util.VerticalSpacingItemDecorator;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,21 +29,21 @@ public class NotesListActivity extends AppCompatActivity implements
     private static final String TAG = "NotesListActivity";
 
     // UI Components
-    private RecyclerView mRecyclerView;
+    private RecyclerView gRecyclerView;
 
     // Variables
-    private ArrayList<Note> mNotes = new ArrayList<>();
-    private NotesRecyclerAdapter mNoteRecyclerAdapter;
-    private NoteRepository mNoteRepository;
+    private ArrayList<Note> gNotes = new ArrayList<>();
+    private NotesRecyclerAdapter gNoteRecyclerAdapter;
+    private NoteRepository gNoteRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_list);
         // Activity classes have an implicit view reference, so we can implicitly call findViewByID
-        mRecyclerView = findViewById(R.id.recyclerView);
+        gRecyclerView = findViewById(R.id.recyclerView);
 
-        mNoteRepository = new NoteRepository(this);
+        gNoteRepository = new NoteRepository(this);
 
         // Initialize empty RecyclerView
         initRecyclerView();
@@ -69,16 +68,16 @@ public class NotesListActivity extends AppCompatActivity implements
         in Room.
      */
     private void retrieveNotes() {
-        mNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
+        gNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
-                if (mNotes.size() > 0) {
-                    mNotes.clear();
+                if (gNotes.size() > 0) {
+                    gNotes.clear();
                 }
                 if (notes != null) {
-                    mNotes.addAll(notes);
+                    gNotes.addAll(notes);
                 }
-                mNoteRecyclerAdapter.notifyDataSetChanged();
+                gNoteRecyclerAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -89,10 +88,10 @@ public class NotesListActivity extends AppCompatActivity implements
             note.setTitle("title#" + i);
             note.setTimestamp("Jan 2019");
             note.setContent("content#" + i);
-            mNotes.add(note);
+            gNotes.add(note);
         }
         // Important call that notifies system that data set has changed and list can be updated
-        mNoteRecyclerAdapter.notifyDataSetChanged();
+        gNoteRecyclerAdapter.notifyDataSetChanged();
     }
 
     /*
@@ -103,12 +102,12 @@ public class NotesListActivity extends AppCompatActivity implements
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
 
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mNoteRecyclerAdapter = new NotesRecyclerAdapter(mNotes, this);
-        mRecyclerView.setAdapter(mNoteRecyclerAdapter);
-        mRecyclerView.addItemDecoration(itemDecorator);
+        gRecyclerView.setLayoutManager(linearLayoutManager);
+        gNoteRecyclerAdapter = new NotesRecyclerAdapter(gNotes, this);
+        gRecyclerView.setAdapter(gNoteRecyclerAdapter);
+        gRecyclerView.addItemDecoration(itemDecorator);
 
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(gRecyclerView);
     }
 
     @Override
@@ -116,7 +115,7 @@ public class NotesListActivity extends AppCompatActivity implements
         Log.d(TAG, "onNoteClick: clicked " + position);
 
         Intent intent = new Intent(this, NoteActivity.class);
-        intent.putExtra("selected_note", mNotes.get(position));
+        intent.putExtra("selected_note", gNotes.get(position));
         startActivity(intent);
     }
 
@@ -128,10 +127,10 @@ public class NotesListActivity extends AppCompatActivity implements
 
     // Implementing a way to delete an item entry by swiping it to the right or left
     private void deleteNote(Note note) {
-        mNotes.remove(note);
-        mNoteRecyclerAdapter.notifyDataSetChanged();
+        gNotes.remove(note);
+        gNoteRecyclerAdapter.notifyDataSetChanged();
 
-        mNoteRepository.deleteNote(note);
+        gNoteRepository.deleteNote(note);
     }
 
     // Designed to work with RecyclerViews.  SimpleCallback is a simpler version of Callback
@@ -143,7 +142,7 @@ public class NotesListActivity extends AppCompatActivity implements
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteNote(mNotes.get(viewHolder.getAdapterPosition()));
+            deleteNote(gNotes.get(viewHolder.getAdapterPosition()));
         }
     };
 }

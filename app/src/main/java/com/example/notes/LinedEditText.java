@@ -12,16 +12,16 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 public class LinedEditText extends AppCompatEditText {
 
-    private Rect mRect;
-    private Paint mPaint;
+    private Rect gRect;
+    private Paint gPaint;
 
     public LinedEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mRect = new Rect();
-        mPaint = new Paint();
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(2);
-        mPaint.setColor(Color.BLACK);
+        gRect = new Rect();
+        gPaint = new Paint();
+        gPaint.setStyle(Paint.Style.STROKE);
+        gPaint.setStrokeWidth(2);
+        gPaint.setColor(Color.BLACK);
     }
 
 
@@ -33,8 +33,8 @@ public class LinedEditText extends AppCompatEditText {
         int lineHeight = getLineHeight();
         int numberOfLines = height / lineHeight;
 
-        Rect rect = mRect;
-        Paint paint = mPaint;
+        Rect rect = gRect;
+        Paint paint = gPaint;
 
         int baseline = getLineBounds(0, rect);
 
