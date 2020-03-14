@@ -1,3 +1,3 @@
-#Notes - Note Taking App
+# Notes - Note Taking App
 
-![](images/ss1.png 20x5)
+<img src="images/ss1.png" width="300" 
