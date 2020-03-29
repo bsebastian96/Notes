@@ -8,7 +8,7 @@ This is my first Android application.  Followed CodingWithMitch's [SQLite for Be
  - Android Studio
  - Building custom toolbars and customizing behavior
  - RecyclerView and Listeners
- - Avtivity navigation/interaction using intents
+ - Activity navigation/interaction using intents
  - Room persistence
  - SQLite DB transactions
  - Threading/AsyncTask
